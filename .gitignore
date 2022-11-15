@@ -1,3 +1,5 @@
 *.ini
-/files/log/*.log
-/files/logClsAudioOut.log
+files/log/*.log
+files/logClsAudioOut.log
+Classes/__pycache__/
+functions/__pycache__/

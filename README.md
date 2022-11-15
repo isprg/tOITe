@@ -8,10 +8,13 @@ tOITe システムのベースコード
 
 メイン実行ファイル
 
-### requirements.txt
+### Pipfile
 
-パッケージ管理ファイル
-`pip install -r requirements.txt`で全てのライブラリが一括インストールできます。
+pipenv 設定ファイル
+
+### Pipfile.lock
+
+pipfile バージョン管理ファイル
 
 ### /Classes
 
