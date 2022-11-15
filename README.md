@@ -8,6 +8,11 @@ tOITe システムのベースコード
 
 メイン実行ファイル
 
+### requirements.txt
+
+パッケージ管理ファイル
+`pip install -r requirements.txt`で全てのライブラリが一括インストールできます。
+
 ### /Classes
 
 カメラ、オーディオ、画面遷移処理などのクラス
