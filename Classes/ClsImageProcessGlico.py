@@ -1,4 +1,4 @@
-from ClsImageProcess import ClsImageProcess
+from Classes.ClsImageProcess import ClsImageProcess
 
 
 class ClsImageProcessGlico(ClsImageProcess):
