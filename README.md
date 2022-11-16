@@ -2,6 +2,22 @@
 
 tOITe システムのベースコード
 
+# コードのダウンロード方法
+
+1. ページ右の Release から Latest の表示のものをクリック
+
+![](https://gyazo.com/1ab9f150d87e25e5b611625ec4d65f3c.png)
+
+---
+
+2. 開いたページの Assets 内の Source code (zip)よりダウンロード
+
+![](https://gyazo.com/9cff07aaeb8095b6d458dd9b9d48a70f.png)
+
+---
+
+3. ダウンロードしたファイルを解凍
+
 # ディレクトリ構造
 
 ### tOITe_Main.py
