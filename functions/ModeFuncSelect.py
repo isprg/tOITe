@@ -1,6 +1,6 @@
 import pyautogui
+from functions.common import GetListGames, GetListGameFlags, CheckTappedArea
 from functions.setGUI import setGUI
-from functions.common import CheckTappedArea
 from functions.DesignLayout import make_fullimage_layout
 
 
@@ -55,6 +55,7 @@ def procSelect_Q2(dictArgument):
 	event = dictArgument["Event"]
 	cState = dictArgument["State"]
 	cLogger = dictArgument["Logger"]
+	cCtrlCard = dictArgument["CtrlCard"]
 	cAudioOut = dictArgument["AudioOut"]
 	vHistory = dictArgument["Option"]
 
@@ -76,9 +77,9 @@ def procSelect_Q2(dictArgument):
 
 		if vHistory[0:2] == [1,1]:
 			dictArgument["Start time"] = cState.updateState("SELECT_GAME")
-			cState.dictWindow["SELECT_GAME"]["多岐選択"].update(disabled=True)
 			vHistory[0:2] = [0,0]
-	
+			cCtrlCard.writeCardRecord(GetListGameFlags(3), "T")
+			cState.dictWindow["SELECT_GAME"][GetListGames(3)].update(disabled=True)
 
 
 

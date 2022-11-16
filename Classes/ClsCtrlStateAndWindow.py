@@ -10,18 +10,17 @@ class ClsCtrlStateAndWindow:
 				window = self.dictWindow[sKey]
 				window.hide()
 				#window.Maximize()
-				
-		# 背景ウィンドウ
-		window = self.dictWindow[strBackGround]
+		window = self.dictWindow[strBackGround] #背景ウィンドウ
 		window.un_hide()
-
-		# 初期ウィンドウ
-		window = self.dictWindow[strFirstWindow]
+		window = self.dictWindow[strFirstWindow] #初期ウィンドウ
 		window.un_hide()
 
 		self.strState = strFirstWindow
 
-	def Finalize(self):
+	def __del__(self):
+		self.finalize()
+
+	def finalize(self):
 		self.closeAllWindows()
 
 	def setLogger(self, cLogger):

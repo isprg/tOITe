@@ -1,7 +1,7 @@
 import pyautogui
 import speech_recognition as sr
+from functions.common import GetListGames, GetListGameFlags, CheckTappedArea
 from functions.setGUI import setGUI
-from functions.common import CheckTappedArea
 from functions.DesignLayout import make_fullimage_layout
 
 
@@ -18,8 +18,7 @@ def updateDictProc_Speech(dictProc):
 def updateDictWindow_Speech(dictWindow):
 	layoutSpeech_Q1 = make_fullimage_layout("images/speech1.png", "SPEECH_Q1")
 	layoutSpeech_Q2 = make_fullimage_layout("images/speech2.png", "SPEECH_Q2")
-	layoutSpeech_Correct = make_fullimage_layout(
-		"images/correct.png", "SPEECH_CORRECT")
+	layoutSpeech_Correct = make_fullimage_layout("images/correct.png", "SPEECH_CORRECT")
 	layoutSpeech_Wrong = make_fullimage_layout("images/wrong.png", "SPEECH_WRONG")
 
 	dictLayout = {
@@ -75,6 +74,7 @@ def procSpeech_Q2(dictArgument):
 	event = dictArgument["Event"]
 	cState = dictArgument["State"]
 	cLogger = dictArgument["Logger"]
+	cCtrlCard = dictArgument["CtrlCard"]
 	cAudioIn = dictArgument["AudioIn"]
 	cAudioOut = dictArgument["AudioOut"]
 	strVoiceFileName = "voice.wav"
@@ -108,6 +108,8 @@ def procSpeech_Q2(dictArgument):
 			if listCorrect == [True, True, True]:
 				cAudioOut.playSoundAsync("sound/correct_24.wav")
 				dictArgument["Start time"] = cState.updateState("SPEECH_CORRECT")
+				cCtrlCard.writeCardRecord(GetListGameFlags(0), "T")
+				cState.dictWindow["SELECT_GAME"][GetListGames(0)].update(disabled=True)
 			else:
 				cAudioOut.playSoundAsync("sound/wrong_24.wav")
 				dictArgument["Start time"] = cState.updateState("SPEECH_WRONG")
@@ -117,19 +119,15 @@ def procSpeech_Q2(dictArgument):
 def procSpeech_Correct(dictArgument):
 	event = dictArgument["Event"]
 	cState = dictArgument["State"]
-	cCtrlCard = dictArgument["CtrlCard"]
 
 	if event == "SPEECH_CORRECT":
-		cCtrlCard.write_result("speech", "T")
 		dictArgument["Start time"] = cState.updateState("SELECT_GAME")
-		cState.dictWindow["SELECT_GAME"]["音声認識"].update(disabled=True)
 
 
 # SPEECH_WRONGモード処理　===================================================
 def procSpeech_Wrong(dictArgument):
 	event = dictArgument["Event"]
 	cState = dictArgument["State"]
-	cCtrlCard = dictArgument["CtrlCard"]
 
 	if event == "SPEECH_WRONG":
 		dictArgument["Start time"] = cState.updateState("SPEECH_Q2")

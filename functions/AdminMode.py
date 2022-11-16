@@ -1,66 +1,64 @@
+from tty import CC
 import yaml
 
-from Classes.ClsCardIF import ClsCardIF
-from Classes.ClsCtrlCard import ClsCtrlCard
-from functions.common import CheckComplete, getDictFlag
+from Classes.ClsNtagIF import ClsNtagIF
+from Classes.ClsLogger import ClsLogger
+from functions.common import GetDictFlag
 from functions.AdminModeWindow import *
 
 
 # Adminカード登録 =============================================
-def Register_Admin_Card(Activate_CardID):
-	file_path = "files/Admin_CardID_list.yaml"
-	with open(file_path, "r") as f:
-		card_ID_list = yaml.safe_load(f)["card_ID"]
+def Register_Admin_Card(cLogger):
+	dictFlag = GetDictFlag()
+	cCtrlCard = ClsNtagIF(cLogger, dictFlag, False)
 
-	text = ""
-	for i in card_ID_list:
-		if i == Activate_CardID:
-			i += " (used for activation)"
-		text += i
-		text += "\n"
+	strFilePath = "files/Admin_CardID_list.yaml"
+	with open(strFilePath, "r") as f:
+		listCardID = yaml.safe_load(f)["card_ID"]
 
-	window = MakeRegisterAdminWindow(text)
+	strIdList = ""
+	for i in listCardID:
+		strIdList += i
+		strIdList += "\n"
+
+	window = MakeRegisterAdminWindow(strIdList)
 
 	# テキストボックスで UnDo(ctrl-z) を有効にする．
 	multiline = window["ID_list"].Widget  # この2行がポイント
 	multiline.configure(undo=True)
 
-	# カード操作用のクラスを生成
-	cCardIF = ClsCardIF()
-	cCardIF.open()
-
 	while True:
 		event, values = window.read(timeout=500, timeout_key="-timeout-")
 
 		if event == "register":
-			text = values["ID_list"]
-			text += "\n"
+			strIdList = values["ID_list"]
+			strIdList += "\n"
 
-			if cCardIF.sense() is not None:
-				NewID = cCardIF.getID()
-				text += NewID
+			if cCtrlCard.readCardInfo():
+				strNewID = cCtrlCard.getID()
+				strIdList += strNewID
 
-			window["ID_list"].Update(text)
+			window["ID_list"].Update(strIdList)
 
 		elif event == "end":
-			text = values["ID_list"]
+			strIdList = values["ID_list"]
 			break
 
 	# IDのリストを保存
-	text = text.replace(" (used for activation)", "")
-	card_ID_list = text.split()
-	with open(file_path, "w") as f:
-		yaml.dump({"card_ID": card_ID_list}, f)
+	strIdList = strIdList.replace(" (used for activation)", "")
+	listCardID = strIdList.split()
+	with open(strFilePath, "w") as f:
+		yaml.dump({"card_ID": listCardID}, f)
 
 	window.close()
-	cCardIF.close()
+	cCtrlCard.finalize()
 
 
 # カード編集 =============================================
-def Edit_Card():
-	dictFlag = getDictFlag()
+def Edit_Card(cLogger):
+	dictFlag = GetDictFlag()
 	winSetCard, winEdit = MakeEditWindow(dictFlag)
-	cCtrlCard = ClsCtrlCard(dictFlag)
+	cCtrlCard = ClsNtagIF(cLogger, dictFlag, True)
 
 	# 初期画面を設定
 	winEdit.hide()
@@ -69,18 +67,22 @@ def Edit_Card():
 		event, values = window.read(timeout=500, timeout_key="-timeout-")
 
 		if event == "edit":
-			if cCtrlCard.setCard():
-				# Edit画面での編集可能な項目一覧を取得
-				_, window_element_list = winEdit.read(timeout=0)
-				window_element_list = window_element_list.keys()
+			if cCtrlCard.readCardInfo() == True:
+				if cCtrlCard.readCardRecord() == True:
+					# Edit画面での編集可能な項目一覧を取得
+					_, window_element_list = winEdit.read(timeout=0)
+					window_element_list = window_element_list.keys()
 
-				# カードから記録を読み出し
-				dictSaveData = cCtrlCard.read_result()
+					# カードから記録を読み出し
+					dictSaveData = cCtrlCard.getRecord()
 
-				# カードに記録されている値を初期値として設定
-				for key, val in dictSaveData.items():
-					if key in window_element_list and val == "T":
-						winEdit[key].update(True)
+					# カードに記録されている値を初期値として設定
+					for key, val in dictSaveData.items():
+						if key in window_element_list:
+							if val == "T":
+								winEdit[key].update(True)
+							else:
+								winEdit[key].update(False)
 
 			# 編集画面に移行
 			winSetCard.hide()
@@ -88,19 +90,17 @@ def Edit_Card():
 			window = winEdit
 
 		elif event == "write":
-			if cCtrlCard.check_exist() and cCtrlCard.initCard():
-				for key, val in values.items():
-					if key in dictFlag and val is True:
-						cCtrlCard.write_result(key, "T")
-
-				# ゲームクリア状態になった場合，記録を追加
-				bClear = CheckComplete(cCtrlCard, dictFlag)
-				if bClear:
-					cCtrlCard.write_result("complete", "T")
-				else:
-					cCtrlCard.write_result("complete", "0")
-			else:
-				print("failed to write")
+			if cCtrlCard.readCardInfo():
+				if cCtrlCard.isWritable():
+					strRecordToWrite = ""
+					for key, val in values.items():
+						if val is True:
+							strRecordToWrite += "T"
+						else:
+							strRecordToWrite += "0"
+					while len(strRecordToWrite) < 16:
+						strRecordToWrite += "0"
+					cCtrlCard.writeRecordDirect(strRecordToWrite)
 
 		elif event == "return":
 			# 初期画面に移行
@@ -113,12 +113,13 @@ def Edit_Card():
 
 	winSetCard.close()
 	winEdit.close()
-	cCtrlCard.Finalize()
+	cCtrlCard.finalize()
 
 
 # メイン画面（動作選択） =============================================
-def AdminMode(Activate_CardID):
+def AdminModeIndependent():
 	window = MakeMainWindow()
+	cLogger = ClsLogger("tOITe-Admin")
 
 	while True:
 		event, values = window.read(timeout=500, timeout_key="-timeout-")
@@ -133,10 +134,10 @@ def AdminMode(Activate_CardID):
 
 		elif event == "register":
 			window.hide()
-			Register_Admin_Card(Activate_CardID)
+			Register_Admin_Card(cLogger)
 			window.un_hide()
 
 		elif event == "edit":
 			window.hide()
-			Edit_Card()
+			Edit_Card(cLogger)
 			window.un_hide()

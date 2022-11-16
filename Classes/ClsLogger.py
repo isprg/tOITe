@@ -4,8 +4,8 @@ from logging import NOTSET, getLogger, StreamHandler, FileHandler, Formatter, DE
 
 
 class ClsLogger:
-	def __init__(self):
-		self.logger = getLogger("tOITe-Log")
+	def __init__(self, strLogName):
+		self.logger = getLogger(strLogName)
 		self.logger.setLevel(DEBUG)
 		self.hStream = StreamHandler()
 		self.hStream.setLevel(DEBUG)
@@ -22,6 +22,13 @@ class ClsLogger:
 		self.hFile.setFormatter(formatter)
 		self.logger.addHandler(self.hFile)
 
+	def __del__(self):
+		self.finalize()
+
+	def finalize(self):
+		self.logger.removeHandler(self.hStream)
+		self.logger.removeHandler(self.hFile)
+
 	def logDebug(self, *tplLogForDebug):
 		strLogAll = ""
 		for strLog in tplLogForDebug:
@@ -33,5 +40,12 @@ class ClsLogger:
 
 if __name__ == '__main__':
 	from ClsLogger import ClsLogger
+	import time
+	cLogger = ClsLogger("test")
+	cLogger.logDebug("debug!")
+	cLogger.finalize()
+	time.sleep(1)
+	cLogger = ClsLogger("test")
+	cLogger.logDebug("debug2!")
 
 

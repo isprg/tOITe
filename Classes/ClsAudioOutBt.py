@@ -6,7 +6,6 @@ import numpy as np
 from scipy.io.wavfile import read 
 from concurrent.futures import ThreadPoolExecutor
 from alsa_error_handler import noalsaerr
-from ClsLogger import ClsLogger
 
 
 class ClsAudioOutBt:

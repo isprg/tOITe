@@ -68,6 +68,6 @@ def procTutorial_3(dictArgument):
 	cCtrlCard = dictArgument["CtrlCard"]
 
 	if event == "TUTORIAL_3" and cAudioOut.getSoundEnd() == True:
-		cCtrlCard.write_result("tutorial", "T")
+		cCtrlCard.writeCardRecord("tutorial", "T")
 		dictArgument["Start time"] = cState.updateState("SELECT_GAME")
 

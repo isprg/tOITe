@@ -1,63 +1,55 @@
 import csv
-import os
-import subprocess
 
 
-# アンケート結果をCSVファイルに保存
-def getDictFlag():
+def GetListGames(sNumOfGame=None):
+	listGames = ["音声認識", "姿勢推定", "QRコード", "多岐選択"]
+	if sNumOfGame == None:
+		return listGames
+	else:
+		return listGames[sNumOfGame]
+
+def GetListGameFlags(sNumOfGame=None):
+	listGameFlags = ["speech", "pose", "qr", "select"]
+	if sNumOfGame == None:
+		return listGameFlags
+	else:
+		return listGameFlags[sNumOfGame]
+
+def GetDictFlag():
 	dictFlag = {
-		"tutorial"		: "チュートリアル",
-		"speech"		: "音声認識",
-		"pose"			: "姿勢推定",
-		"select"		: "多岐選択",
-		"complete"		: "クリア",
+		"tutorial"			: "チュートリアル",
+		GetListGameFlags(0)	: GetListGames(0),
+		GetListGameFlags(1)	: GetListGames(1),
+		GetListGameFlags(2)	: GetListGames(2),
+		GetListGameFlags(3)	: GetListGames(3),
 	}
-
 	return dictFlag
 
-	
-# アンケート結果をCSVファイルに保存
-def Record_to_CSV(dictArgument):
+# カードの状態をチェック
+def CheckCard(dictArgument):
+	cLogger = dictArgument["Logger"]
+	cState = dictArgument["State"]
 	cCtrlCard = dictArgument["CtrlCard"]
-	dictSaveData = cCtrlCard.read_result()
-	Card_ID = cCtrlCard.getID()
+	cProc = dictArgument["ListImageProc"][0]
+	blPlayCard = dictArgument["PlayCard"]
 
-	listSurveyResult = [dictSaveData["survey" + str(i + 1)] for i in range(5)]
-	listSurveyResult.insert(0, Card_ID)
-	with open("files/survey_result.csv", "a") as f:
-		writer = csv.writer(f)
-		writer.writerow(listSurveyResult)
+	# カードが存在するかをチェック
+	if blPlayCard:
+		if cCtrlCard.readCardInfo() == False:
+			cLogger.logDebug("Card Error")
+			if cState.dictWindow[cState.strState] == "None":
+				cProc.closeWindows()
 
-	cCtrlCard.write_result("finish_survey", "T")  # アンケート回答済みであることを記録
+			dictArgument["Return state"] = (cState.strState, True)
+			dictArgument["Start time"] = cState.updateState("CARD_ERROR")
 
-
-# ゲームを初期化
-def Reset_Game(dictArgument):
-	sStartTime = dictArgument["State"].updateState("STANDBY")
-	dictArgument["ImageProc"].reset()
-	dictArgument["Event"] = None
-	dictArgument["Values"] = None
-	dictArgument["Frame"] = 0
-	dictArgument["Start time"] = sStartTime
-
-
-# ゲームをクリアしたかを判定
-def CheckComplete(cCtrlCard, dictFlag):
-	dictSaveData = cCtrlCard.read_result()
-
-	bClear = True
-	for key in dictFlag.keys():
-		if dictSaveData[key] != "T" and key != "complete":
-			bClear = False
-			break
-
-	return bClear
-
-
-def PlaySound(path):
-	if os.name != 'nt':
-		subprocess.Popen(["aplay", "--quiet", path])
-	print('play sound')
+			return "CARD_ERROR"
+		else:
+			return cState.strState
+	else:
+		cCtrlCard.readCardInfo()
+		return cState.strState
+		
 
 
 def CheckTappedArea(vPosition, listArea):
@@ -74,4 +66,23 @@ def CheckTappedArea(vPosition, listArea):
 			break
 
 	return sTappedArea
+
+
+def Record_to_CSV(dictArgument):
+	cCtrlCard = dictArgument["CtrlCard"]
+
+	cCtrlCard.readCardRecord()
+	dictSaveData = cCtrlCard.getRecord()
+	strCardID = cCtrlCard.getID()
+
+	listSurveyResult = [dictSaveData["survey" + str(i + 1)] for i in range(5)]
+	listSurveyResult.insert(0, strCardID)
+	with open("files/survey_result.csv", "a") as f:
+		writer = csv.writer(f)
+		writer.writerow(listSurveyResult)
+
+	cCtrlCard.writeCardRecord("finish_survey", "T")  # アンケート回答済みであることを記録
+
+
+
 			

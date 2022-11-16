@@ -4,42 +4,34 @@ sDisplayWidth = 1024
 sDisplayHeight = 600
 
 def MakeMainWindow():
-	sg.set_options(font=("", 12), margins=(0, 0))
+	sg.set_options(font=("", 22), margins=(0, 0))
 	sg.theme("DarkBlue17")
 
-	Button_Size = (15, 3)
+	tplSizeOfButton = (15, 3)
+	sSpaceLeft = 0
+	sSpaceTop = 20
 
-	left_space = 0
-	top_space = 20
 	layout = [
-		[
-			sg.Column(
-				[[sg.Button("プログラム終了", key="end", size=Button_Size,)]],
-				justification="c",
-				pad=((left_space, 0), (top_space, 0)),
-			)
-		],
-		[
-			sg.Column(
-				[[sg.Button("ゲームリセット", key="reset", size=Button_Size)]],
-				justification="c",
-				pad=((left_space, 0), (top_space, 0)),
-			)
-		],
-		[
-			sg.Column(
-				[[sg.Button("管理者カードの登録", key="register", size=Button_Size)]],
-				justification="c",
-				pad=((left_space, 0), (top_space, 0)),
-			)
-		],
-		[
-			sg.Column(
-				[[sg.Button("カードの記録を編集", key="edit", size=Button_Size)]],
-				justification="c",
-				pad=((left_space, 0), (top_space, 0)),
-			)
-		],
+		[sg.Column(
+			[[sg.Button("プログラム終了", key="end", size=tplSizeOfButton)]],
+			justification="c",
+			pad=((sSpaceLeft, 0), (sSpaceTop, 0)),
+		)],
+		[sg.Column(
+			[[sg.Button("ゲームリセット", key="reset", size=tplSizeOfButton)]],
+			justification="c",
+			pad=((sSpaceLeft, 0), (sSpaceTop, 0)),
+		)],
+		[sg.Column(
+			[[sg.Button("管理者カードの登録", key="register", size=tplSizeOfButton)]],
+			justification="c",
+			pad=((sSpaceLeft, 0), (sSpaceTop, 0)),
+		)],
+		[sg.Column(
+			[[sg.Button("カードの記録を編集", key="edit", size=tplSizeOfButton)]],
+			justification="c",
+			pad=((sSpaceLeft, 0), (sSpaceTop, 0)),
+		)],
 	]
 
 
@@ -58,15 +50,11 @@ def MakeMainWindow():
 
 def MakeEditWindow(dictFlag):
 	layoutSetCard = [
-		[
-			sg.Column(
-				[[sg.Text("編集したいカードを設置した状態で「編集ボタン」を押してください．")]],
-				pad=((0, 0), (200, 0)),
-			)
-		],
-		[
-			sg.Button("編集", key="edit"),
-			sg.Button("終了", key="end"),
+		[sg.Column(
+			[[sg.Text("編集したいカードを設置した状態で「編集ボタン」を押してください．")]],
+			pad=((0, 0), (200, 0)),
+		)],
+		[sg.Button("編集", key="edit"), sg.Button("終了", key="end"),
 		],
 	]
 	
@@ -74,43 +62,34 @@ def MakeEditWindow(dictFlag):
 	listFlagValues = list(dictFlag.values())
 
 	layoutEdit = [
-		[
-			sg.Column(
-				[
-					[
-						sg.Text(
-							"チェックを追加するとクリア済みになります．\n編集が完了したら書き込みボタンを押してください．",
-							font=("", 18),
-						)
-					]
-				],
-				pad=((0, 0), (50, 0)),
-				justification="c",
-			)
-		],
-		[
-			sg.Frame(
-				"ゲーム一覧",
-				[
-					[sg.Checkbox(listFlagValues[0], key=listFlagKeys[0])],
-					[sg.Checkbox(listFlagValues[1], key=listFlagKeys[1])],
-					[sg.Checkbox(listFlagValues[2], key=listFlagKeys[2])],
-					[sg.Checkbox(listFlagValues[3], key=listFlagKeys[3])],
-				],
-				pad=((300, 0), (0, 0)),
-			)
-		],
-		[
-			sg.Column(
-				[
-					[
-						sg.Button("書き込み", key="write"),
-						sg.Button("戻る", key="return"),
-					],
-				],
-				justification="c",
-			)
-		],
+		[sg.Column(
+			[[
+				sg.Text(
+					"チェックを追加するとクリア済みになります．\n編集が完了したら書き込みボタンを押してください．",
+					font=("", 18),
+				)
+			]],
+			pad=((0, 0), (50, 0)),
+			justification="c",
+		)],
+		[sg.Frame(
+			"ゲーム一覧",
+			[
+				[sg.Checkbox(listFlagValues[0], key=listFlagKeys[0])],
+				[sg.Checkbox(listFlagValues[1], key=listFlagKeys[1])],
+				[sg.Checkbox(listFlagValues[2], key=listFlagKeys[2])],
+				[sg.Checkbox(listFlagValues[3], key=listFlagKeys[3])],
+				[sg.Checkbox(listFlagValues[4], key=listFlagKeys[4])],
+			],
+			pad=((300, 0), (0, 0)),
+		)],
+		[sg.Column(
+			[[
+				sg.Button("書き込み", key="write"),
+				sg.Button("戻る", key="return"),
+			],],
+			justification="c",
+		)],
 	]
 
 	winSetCard = sg.Window(

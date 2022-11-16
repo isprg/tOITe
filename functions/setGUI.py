@@ -6,7 +6,7 @@ def setGUI(dictLayout):
 	sDisplayWidth = 1024
 	sDisplayHeight = 600
 
-	sg.set_options(font=("", 13), margins=(0, 0))
+	sg.set_options(font=("", 22), margins=(0, 0))
 	sg.theme("BrownBlue")
 
 	dictWindow = {}

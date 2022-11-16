@@ -2,7 +2,7 @@ import pyaudio
 import wave
 import os
 from concurrent.futures import ThreadPoolExecutor
-from alsa_error_handler import noalsaerr
+from Classes.alsa_error_handler import noalsaerr
 
 
 class ClsAudioIn:

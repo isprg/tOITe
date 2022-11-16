@@ -5,10 +5,16 @@ from concurrent.futures import ThreadPoolExecutor
 
 class ClsAudioOut:
 	def __init__(self, cLogger):
+		self.logger = cLogger
 		self.blSoundEnd = False
 		self.blExecutorWorking = False
 		self.blStateChange = False
-		self.logger = cLogger
+
+	def __del__(self):
+		self.finalize()
+
+	def finalize(self):
+		pass
 
 	def setDictArgument(self, dictArgument):
 		self.dictArgument = dictArgument
